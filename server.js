@@ -7,6 +7,7 @@ const server = http.createServer((req, res) => {
     if (req.url === '/') {
         fs.readFile(path.join(__dirname, 'qwen-full.html'), (err, data) => {
             if (err) {
+                console.error('Ошибка чтения файла:', err);
                 res.writeHead(500);
                 res.end('Error');
             } else {
@@ -37,9 +38,12 @@ wss.on('connection', (ws) => {
     ws.on('close', () => {
         console.log('Пользователь отключился от QwenCord');
     });
+
+    ws.onerror = (err) => {
+        console.error('WebSocket ошибка:', err);
+    };
 });
 
-// Render задаёт PORT
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log(`QwenCord запущен на порту ${PORT}`);
