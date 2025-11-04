@@ -462,6 +462,14 @@
                     peerConnection.addIceCandidate(data.candidate);
                 }
             };
+
+            ws.onerror = (err) => {
+                console.error('WebSocket ошибка:', err);
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket соединение закрыто');
+            };
         }
 
         function register() {
@@ -528,6 +536,9 @@
                             audioOutput.appendChild(option);
                         }
                     });
+                })
+                .catch(err => {
+                    console.error('Ошибка доступа к устройствам:', err);
                 });
         }
 
@@ -573,8 +584,12 @@
                 time: new Date().toLocaleTimeString()
             };
 
-            ws.send(JSON.stringify({ type: 'message', payload: message }));
-            input.value = '';
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'message', payload: message }));
+                input.value = '';
+            } else {
+                alert('Соединение с сервером не установлено');
+            }
         }
 
         function loadMessages() {
@@ -621,7 +636,7 @@
                 ws.send(JSON.stringify({ type: 'call_offer', offer: offer }));
                 document.getElementById('videoCall').style.display = 'flex';
             } catch (err) {
-                console.error(err);
+                console.error('Ошибка доступа к камере/микрофону:', err);
                 alert('Не удалось получить доступ к камере/микрофону');
             }
         }
