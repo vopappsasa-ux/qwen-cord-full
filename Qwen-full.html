@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>QwenCord</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Whitney:Book,Medium,Bold&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Whitney', 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        body {
+            background-color: #36393f;
+            color: #ffffff;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(75deg, #5865f2, #5b34da);
+        }
+
+        .auth-container {
+            width: 480px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .auth-box {
+            background-color: #36393f;
+            border-radius: 5px;
+            width: 100%;
+            padding: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.2);
+        }
+
+        .auth-header {
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .auth-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .auth-form input {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 16px;
+            background-color: #202225;
+            border: 1px solid #202225;
+            border-radius: 3px;
+            color: #ffffff;
+            font-size: 16px;
+        }
+
+        .auth-form input:focus {
+            outline: none;
+            border-color: #00aff4;
+        }
+
+        .auth-form button {
+            width: 100%;
+            padding: 14px;
+            background-color: #5865f2;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        /* App */
+        .app {
+            display: none;
+            width: 100%;
+        }
+
+        /* Server Sidebar */
+        .server-sidebar {
+            width: 72px;
+            background-color: #202225;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 0;
+        }
+
+        .server-icon {
+            width: 48px;
+            height: 48px;
+            background-color: #5865f2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            margin-bottom: 8px;
+        }
+
+        .server-icon:hover {
+            background-color: #6e7bd3;
+        }
+
+        .server-divider {
+            width: 32px;
+            height: 2px;
+            background-color: #36393f;
+            margin: 6px 0;
+        }
+
+        /* Channel Sidebar */
+        .channel-sidebar {
+            width: 240px;
+            background-color: #2f3136;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .server-name {
+            height: 48px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .channels-list {
+            padding: 8px;
+            flex: 1;
+        }
+
+        .channel-category {
+            color: #8e9297;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin: 16px 8px 4px;
+        }
+
+        .channel-item {
+            padding: 8px 6px;
+            border-radius: 4px;
+            margin-bottom: 2px;
+            cursor: pointer;
+            color: #8e9297;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+        }
+
+        .channel-item:hover {
+            background-color: #40444b;
+            color: #ffffff;
+        }
+
+        .channel-item.active {
+            background-color: #40444b;
+            color: #ffffff;
+        }
+
+        .channel-item::before {
+            content: '#';
+            margin-right: 6px;
+        }
+
+        /* Chat Area */
+        .chat-area {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            background-color: #36393f;
+        }
+
+        .chat-header {
+            height: 48px;
+            background-color: #2f3136;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            border-left: 1px solid #292b2f;
+        }
+
+        .chat-messages {
+            padding: 24px 32px 0;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 16px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #5865f2;
+            margin-right: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: baseline;
+        }
+
+        .username {
+            font-weight: 600;
+            color: #ffffff;
+            margin-right: 8px;
+        }
+
+        .timestamp {
+            font-size: 12px;
+            color: #72767d;
+        }
+
+        .message-text {
+            color: #dcddde;
+            margin-top: 4px;
+            line-height: 1.125rem;
+        }
+
+        .chat-input-container {
+            padding: 16px;
+            background-color: #2f3136;
+        }
+
+        .chat-input {
+            width: 100%;
+            padding: 8px 16px;
+            background-color: #40444b;
+            border: none;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 16px;
+        }
+
+        .chat-input:focus {
+            outline: none;
+        }
+
+        /* Video Call */
+        .video-call {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            z-index: 1000;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .video-call video {
+            width: 80%;
+            max-height: 80%;
+        }
+
+        .call-controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .call-controls button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #endCall {
+            background-color: #f04747;
+            color: white;
+        }
+
+        #acceptCall {
+            background-color: #5865f2;
+            color: white;
+        }
+
+        /* Settings */
+        .settings-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .settings-box {
+            background-color: #2f3136;
+            padding: 30px;
+            border-radius: 10px;
+            width: 400px;
+        }
+
+        .settings-box h2 {
+            margin-bottom: 20px;
+        }
+
+        .settings-box label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        .settings-box select {
+            width: 100%;
+            padding: 8px;
+            background-color: #202225;
+            color: white;
+            border: 1px solid #202225;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Экран авторизации -->
+    <div class="login-screen" id="loginScreen">
+        <div class="auth-container">
+            <div class="auth-box">
+                <div class="auth-header">
+                    <h1>Добро пожаловать в QwenCord!</h1>
+                </div>
+                <div class="auth-form">
+                    <input type="text" id="username" placeholder="Имя пользователя" required>
+                    <input type="password" id="password" placeholder="Пароль" required>
+                    <button onclick="register()">Зарегистрироваться</button>
+                    <button onclick="login()">Войти</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Основное приложение -->
+    <div class="app" id="app">
+        <div class="server-sidebar">
+            <div class="server-icon">Q</div>
+            <div class="server-divider"></div>
+            <div class="server-icon">2</div>
+        </div>
+
+        <div class="channel-sidebar">
+            <div class="server-name">QwenCord</div>
+            <div class="channels-list">
+                <div class="channel-category">Текстовые каналы</div>
+                <div class="channel-item active" data-channel="general"># general</div>
+                <div class="channel-item" data-channel="music"># music</div>
+                <div class="channel-item" data-channel="voice"># voice</div>
+            </div>
+        </div>
+
+        <div class="chat-area">
+            <div class="chat-header">
+                <h3 id="currentChannel"># general</h3>
+            </div>
+            <div class="chat-messages" id="messages">
+                <!-- Сообщения -->
+            </div>
+            <div class="chat-input-container">
+                <input type="text" id="msgInput" class="chat-input" placeholder="Сообщение #general" onkeypress="if(event.key==='Enter') sendMessage()">
+            </div>
+        </div>
+    </div>
+
+    <!-- Экран звонка -->
+    <div class="video-call" id="videoCall">
+        <video id="localVideo" autoplay muted></video>
+        <video id="remoteVideo" autoplay></video>
+        <div class="call-controls">
+            <button id="endCall" onclick="endCall()">Завершить</button>
+            <button id="acceptCall" onclick="acceptCall()" style="display:none;">Принять</button>
+        </div>
+    </div>
+
+    <!-- Настройки -->
+    <div class="settings-screen" id="settingsScreen">
+        <div class="settings-box">
+            <h2>Настройки</h2>
+            <label for="audioInput">Микрофон:</label>
+            <select id="audioInput"></select>
+            <label for="videoInput">Камера:</label>
+            <select id="videoInput"></select>
+            <label for="audioOutput">Динамики:</label>
+            <select id="audioOutput"></select>
+            <button onclick="saveSettings()">Сохранить</button>
+            <button onclick="closeSettings()">Закрыть</button>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let currentChannel = 'general';
+        let ws = null;
+        let localStream = null;
+        let remoteStream = null;
+        let peerConnection = null;
+        const configuration = {
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' }
+            ]
+        };
+
+        function connectWebSocket() {
+            const wsProtocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+            const wsUrl = wsProtocol + window.location.host;
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = () => console.log('Соединение с QwenCord установлено');
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.type === 'message') {
+                    const messages = JSON.parse(localStorage.getItem('messages') || '[]');
+                    messages.push(data.payload);
+                    localStorage.setItem('messages', JSON.stringify(messages));
+                    loadMessages();
+                }
+                else if (data.type === 'call_offer') {
+                    document.getElementById('acceptCall').style.display = 'block';
+                    peerConnection.setRemoteDescription(data.offer);
+                }
+                else if (data.type === 'call_answer') {
+                    peerConnection.setRemoteDescription(data.answer);
+                }
+                else if (data.type === 'ice_candidate') {
+                    peerConnection.addIceCandidate(data.candidate);
+                }
+            };
+        }
+
+        function register() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                alert('Заполните все поля');
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            if (users.some(u => u.username === username)) {
+                alert('Пользователь уже существует');
+                return;
+            }
+
+            const hashedPassword = btoa(password);
+            users.push({ username, password: hashedPassword });
+            localStorage.setItem('users', JSON.stringify(users));
+            alert('Успешно зарегистрирован');
+        }
+
+        function login() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const user = users.find(u => u.username === username && u.password === btoa(password));
+
+            if (user) {
+                currentUser = username;
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('app').style.display = 'flex';
+                connectWebSocket();
+                loadMessages();
+                loadDevices();
+            } else {
+                alert('Неверный логин или пароль');
+            }
+        }
+
+        function loadDevices() {
+            navigator.mediaDevices.enumerateDevices()
+                .then(devices => {
+                    const audioInput = document.getElementById('audioInput');
+                    const videoInput = document.getElementById('videoInput');
+                    const audioOutput = document.getElementById('audioOutput');
+
+                    audioInput.innerHTML = '';
+                    videoInput.innerHTML = '';
+                    audioOutput.innerHTML = '';
+
+                    devices.forEach(device => {
+                        const option = document.createElement('option');
+                        option.value = device.deviceId;
+                        option.text = device.label || device.kind;
+
+                        if (device.kind === 'audioinput') {
+                            audioInput.appendChild(option);
+                        } else if (device.kind === 'videoinput') {
+                            videoInput.appendChild(option);
+                        } else if (device.kind === 'audiooutput') {
+                            audioOutput.appendChild(option);
+                        }
+                    });
+                });
+        }
+
+        function saveSettings() {
+            const audioInput = document.getElementById('audioInput').value;
+            const videoInput = document.getElementById('videoInput').value;
+            const audioOutput = document.getElementById('audioOutput').value;
+
+            localStorage.setItem('audioInput', audioInput);
+            localStorage.setItem('videoInput', videoInput);
+            localStorage.setItem('audioOutput', audioOutput);
+
+            alert('Настройки сохранены');
+        }
+
+        function openSettings() {
+            document.getElementById('settingsScreen').style.display = 'flex';
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsScreen').style.display = 'none';
+        }
+
+        document.querySelectorAll('.channel-item').forEach(el => {
+            el.addEventListener('click', () => {
+                document.querySelectorAll('.channel-item').forEach(c => c.classList.remove('active'));
+                el.classList.add('active');
+                currentChannel = el.dataset.channel;
+                document.getElementById('currentChannel').textContent = '# ' + currentChannel;
+                loadMessages();
+            });
+        });
+
+        function sendMessage() {
+            const input = document.getElementById('msgInput');
+            const text = input.value.trim();
+            if (!text || !currentUser) return;
+
+            const message = {
+                user: currentUser,
+                text: text,
+                channel: currentChannel,
+                time: new Date().toLocaleTimeString()
+            };
+
+            ws.send(JSON.stringify({ type: 'message', payload: message }));
+            input.value = '';
+        }
+
+        function loadMessages() {
+            const messages = JSON.parse(localStorage.getItem('messages') || '[]');
+            const container = document.getElementById('messages');
+            container.innerHTML = '';
+            messages
+                .filter(m => m.channel === currentChannel)
+                .forEach(msg => {
+                    const el = document.createElement('div');
+                    el.className = 'message';
+                    el.innerHTML = `
+                        <div class="avatar">${msg.user.charAt(0).toUpperCase()}</div>
+                        <div class="message-content">
+                            <div class="message-header">
+                                <span class="username">${msg.user}</span>
+                                <span class="timestamp">${msg.time}</span>
+                            </div>
+                            <div class="message-text">${msg.text}</div>
+                        </div>
+                    `;
+                    container.appendChild(el);
+                });
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function startCall() {
+            try {
+                const audioInput = localStorage.getItem('audioInput');
+                const videoInput = localStorage.getItem('videoInput');
+
+                const constraints = {
+                    audio: audioInput ? { deviceId: { exact: audioInput } } : true,
+                    video: videoInput ? { deviceId: { exact: videoInput } } : true
+                };
+
+                localStream = await navigator.mediaDevices.getUserMedia(constraints);
+                document.getElementById('localVideo').srcObject = localStream;
+
+                setupPeerConnection();
+
+                const offer = await peerConnection.createOffer();
+                await peerConnection.setLocalDescription(offer);
+                ws.send(JSON.stringify({ type: 'call_offer', offer: offer }));
+                document.getElementById('videoCall').style.display = 'flex';
+            } catch (err) {
+                console.error(err);
+                alert('Не удалось получить доступ к камере/микрофону');
+            }
+        }
+
+        function setupPeerConnection() {
+            peerConnection = new RTCPeerConnection(configuration);
+
+            localStream.getTracks().forEach(track => {
+                peerConnection.addTrack(track, localStream);
+            });
+
+            peerConnection.ontrack = (event) => {
+                remoteStream = event.streams[0];
+                document.getElementById('remoteVideo').srcObject = remoteStream;
+            };
+
+            peerConnection.onicecandidate = (event) => {
+                if (event.candidate) {
+                    ws.send(JSON.stringify({ type: 'ice_candidate', candidate: event.candidate }));
+                }
+            };
+        }
+
+        function acceptCall() {
+            document.getElementById('acceptCall').style.display = 'none';
+            peerConnection.createAnswer().then(answer => {
+                peerConnection.setLocalDescription(answer);
+                ws.send(JSON.stringify({ type: 'call_answer', answer: answer }));
+            });
+        }
+
+        function endCall() {
+            if (localStream) localStream.getTracks().forEach(track => track.stop());
+            if (remoteStream) remoteStream.getTracks().forEach(track => track.stop());
+            if (peerConnection) peerConnection.close();
+            document.getElementById('videoCall').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
