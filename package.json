@@ -1,5 +1,5 @@
 {
-  "name": "qwen-cord-full",
+  "name": "qwen-discord",
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
@@ -7,5 +7,6 @@
   },
   "dependencies": {
     "ws": "^8.13.0"
-  }
+  },
+  "license": "MIT"
 }
