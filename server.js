@@ -39,7 +39,8 @@ wss.on('connection', (ws) => {
     });
 });
 
+// Render задаёт PORT
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    console.log(`QwenCord запущен на http://localhost:${PORT}`);
+    console.log(`QwenCord запущен на порту ${PORT}`);
 });
